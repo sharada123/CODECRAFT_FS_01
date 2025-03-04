@@ -1,0 +1,32 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block 'main' %}
+
+  
+  <!--Main section starts-->
+  <div class="container">
+    <div class="row">
+        <div class="col-md-6 d-flex align-items-center justify-content-center">
+            <h1 class="text-center mt-5">Login Here &nbsp;<i class="fa-solid fa-arrow-right-long fa-shake" style="color: #0b419d;"></i></h1>
+        </div>
+      <div class="col-md-6">
+        {% if error %}
+        <div class="alert alert-danger mt-1" role="alert">
+          {{error}}
+          </div>
+        {% endif %}
+        
+        <form method="POST" action="{% url 'Login' %}" class="mt-5"> 
+          {% csrf_token %}
+          {{ form.as_p }}
+          <button type="submit" class="btn btn-primary mb-5">Login</button>
+          <a href="{% url 'RegisterPage' %}">New user register?  Click here to sign up</a>
+        </form>
+      
+      </div>
+    </div>
+  </div>
+
+  <!--main ends-->
+
+{% endblock 'main' %}
