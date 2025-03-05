@@ -1,0 +1,32 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block 'main' %}
+
+  
+  <!--Main section starts-->
+  <div class="container">
+    <div class="row">
+        <div class="col-md-6 d-flex align-items-center justify-content-center">
+            <h1 class="text-center mt-5">Verify OTP  &nbsp;<i class="fa-solid fa-arrow-right-long fa-shake" style="color: #0b419d;"></i></h1>
+        </div>
+      <div class="col-md-6">
+        {% if otp_msg %}
+        <div class="alert alert-success mt-1" role="alert">
+          OTP {{otp_msg}}
+          </div>
+        {% endif %}
+        
+        <form method="POST" action="{% url 'VerifyOtp' %}" class="mt-5"> 
+          {% csrf_token %}
+          {{ form.as_p }}
+          <button type="submit" class="btn btn-primary mb-5">Verify OTP</button>
+          
+        </form>
+      
+      </div>
+    </div>
+  </div>
+
+  <!--main ends-->
+
+{% endblock 'main' %}

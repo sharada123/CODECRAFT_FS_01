@@ -1,10 +1,11 @@
 from django.shortcuts import render,redirect
 from django.shortcuts import HttpResponse
-from .forms import RegistrationForm,LoginForm
+from .forms import RegistrationForm,LoginForm,OTPForm
 from django.contrib.auth.decorators import login_required
 from django.db.models import Q
-from .models import CustomUser
+from .models import CustomUser,OTP
 from django.contrib.auth import authenticate, login,logout
+from .utils import send_otp_email,generate_otp
 # Create your views here.
 
 # Home Page
@@ -12,13 +13,6 @@ def homepage(request):
     form = RegistrationForm()
     return render(request, 'home.html', {'form': form})
 
-# Register Page
-def register_page(request):
-    return render(request, 'register.html', {'form': RegistrationForm()})
-
-# Login Page
-def login_page(request):
-    return render(request, 'login.html', {'form': LoginForm()})
 
 @login_required(login_url='Login') 
 def admin_page(request):
@@ -66,24 +60,26 @@ def login_user(request):
 
     if request.method == 'POST':
         form = LoginForm(request.POST)
-        print("Form valid:", form.is_valid())
-        print("Form data:", form.data)
 
         if form.is_valid():
             username = form.cleaned_data['username']
             password = request.POST.get('password')  # Use raw password
 
             user = authenticate(request, username=username, password=password)
-            print("Authenticated User:", user)
+           
 
             if user:
-                login(request, user)  # Log the user in
-                if user.role == 'admin':
-                    return redirect('admin_dashboard')
-                elif user.role == 'user':
-                    return redirect('user_dashboard')
-                else:
-                    return redirect('home')
+                # Send OTP to user's registered email
+                send_otp_email(user)
+                request.session['email']=user.email
+                return render(request, 'verify_otp.html',{'form':OTPForm(),'opt_msg':f'Sent to mail {user.email}'})
+                # login(request, user)  # Log the user in
+                # if user.role == 'admin':
+                #     return redirect('admin_dashboard')
+                # elif user.role == 'user':
+                #     return redirect('user_dashboard')
+                # else:
+                #     return redirect('home')
             else:
                 return render(request, 'login.html', {'form': form, 'error': 'Invalid username or password!'})
 
@@ -95,9 +91,29 @@ def login_user(request):
 
     return render(request, 'login.html', {'form': form})  # Show login form again
 
-
+def verify_otp(request):
+    if request.method == 'POST':
+        form = OTPForm(request.POST)
+        user=request.user
+        if form.is_valid():
+            email=request.session.get('email')
+            user=CustomUser.objects.filter(email=email).first()
+            otp_entered=form.cleaned_data['otp']
+            otp_record=OTP.objects.filter(user=user).last()
+            if otp_record and  otp_record.otp == otp_entered and otp_record.is_valid():
+                login(request,user)
+                if user.role == 'admin':
+                    return redirect('admin_dashboard')
+                elif user.role == 'user':
+                    return redirect('user_dashboard')
+                else:
+                    return redirect('home')                
+    else:
+        form = OTPForm()
+        return render(request, 'verify_otp.html', {'form': form})
+    
 
 # User Logout
 def logout_user(request):
     logout(request)
-    return redirect('LoginPage')  # Redirect to login page after logout
+    return redirect('Login')  # Redirect to login page after logout

@@ -33,7 +33,7 @@
             </li>
             
             <li class="nav-item">
-              <a class="nav-link active" aria-current="page" href="{% url 'RegisterPage' %}">Sign Up</a>
+              <a class="nav-link active" aria-current="page" href="{% url 'register' %}">Sign Up</a>
             </li>
 
             {% if user.is_authenticated %}
@@ -42,7 +42,7 @@
             </li>
             {% else %}
             <li class="nav-item">
-              <a class="nav-link active" aria-current="page" href="{% url 'LoginPage' %}"> Login</a>
+              <a class="nav-link active" aria-current="page" href="{% url 'Login' %}"> Login</a>
             </li>
             {% endif %}
           </ul>

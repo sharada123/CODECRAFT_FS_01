@@ -27,6 +27,13 @@ SECRET_KEY = 'django-insecure-^h5ibm#68ahq_wlyhyr^dq2sxs2qv(wh47e_g)l57@-rlcc!o)
 DEBUG = True
 
 ALLOWED_HOSTS = []
+# Email Configuration (for sending OTP via email)
+EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+EMAIL_HOST = 'smtp.gmail.com'  
+EMAIL_PORT = 587
+EMAIL_USE_TLS = True
+EMAIL_HOST_USER = 'sharadagadadhe111@gmail.com'
+EMAIL_HOST_PASSWORD = 'xrpgnhncaljsefjf'
 
 
 # Application definition
